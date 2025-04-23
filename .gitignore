@@ -19,6 +19,7 @@ pandasai.egg-info
 #venv
 /venv
 .venv
+/venv_py310
 
 # command line
 /pandasai_cli.egg-info
