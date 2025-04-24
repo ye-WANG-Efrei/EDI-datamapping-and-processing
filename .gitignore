@@ -48,4 +48,4 @@ coverage.xml
 pgdata/
 
 # datasets
-datasets/
+/datasets/
