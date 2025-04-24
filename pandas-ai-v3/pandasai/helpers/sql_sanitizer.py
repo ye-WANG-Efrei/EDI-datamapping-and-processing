@@ -74,8 +74,6 @@ def is_sql_query_safe(query: str, dialect: str = "postgres") -> bool:
             r"\bCURRENT_USER\b",
             r"\bSESSION_USER\b",
             r"\bSYSTEM_USER\b",
-            r"\bVERSION\b",
-            r"\b@@VERSION\b",
             r"--",
             r"/\*.*\*/",  # Block comments and inline comments
         ]
