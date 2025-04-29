@@ -1,16 +1,25 @@
 import pandas as pd
 import json
+from langchain_ollama import OllamaLLM
 from typing import Dict, Any, List
 from langchain_community.llms import Ollama
 from langchain_core.prompts import PromptTemplate
 from langchain.chains import LLMChain
 import ast
+import pandasai as pai
+import pathlib
+import os # Import os module to handle path separators consistently
 import re
+from pandasai.config import Config
+from pandasai.config import ConfigManager
+from pandasai.llm.deepseek_local_llm import DeepSeekLocalLLM
+from pandasai.llm.base import LLM
+from pandasai.dataframe.base import DataFrame as PaiDataFrame
 
 class DataMappingAgent:
     def __init__(self, model_name='deepseek-r1:14b'):
         # 初始化 Ollama 模型
-        self.llm = Ollama(model=model_name)
+        self.llm = OllamaLLM(model=model_name)
         
         # 定義映射提示模板
         self.mapping_prompt = PromptTemplate(
@@ -175,7 +184,7 @@ def main():
     agent = DataMappingAgent()
     
     # 載入檔案
-    file_path = '"data/employee_data.xlsx'
+    file_path = 'D:\zWork\dream2rich\ollama_agent\EDI-datamapping-and-processing\data\employee_data_mapped.xlsx'
     data = agent.load_file(file_path)
     
     # 展示原始數據

@@ -132,28 +132,42 @@ class DataSQL:
         
         try:
             print("发送消息到模型...")
-            # 使用字典格式，以便与 RunnableWithMessageHistory 兼容
-            response = self.conversation.invoke(
-                {"input": formatted_prompt},
-                config={"configurable": {"session_id": "default"}}
-            )
+            #            # 使用字典格式，以便与 RunnableWithMessageHistory 兼容
+            # response = self.conversation.invoke(
+            #     {"input": formatted_prompt},
+            #     config={"configurable": {"session_id": "default"}}
+            # )
+            # 直接使用字符串而不是字典
+            response = self.llm.invoke(formatted_prompt)
             print("收到模型响应")
-            print("response类型:", type(response))
-            print("response: ", response)   
+            # print("response类型:", type(response))
+            # print("response: ", response)   
             
-            # 清理响应中的任何非SQL内容
-            sql_query = response.content.strip()
-            sql_query = sql_query.replace("```sql", "").replace("```", "")
-            sql_query = sql_query.replace("<think>", "").replace("</think>", "")
-            if "\n" in sql_query:
-                sql_query = sql_query.split("\n")[0]  # 只取第一行
+            # 提取 SQL 查詢            # 清理响应中的任何非SQL内容
+            # sql_query = response.content.strip()
+            # sql_query = sql_query.replace("```sql", "").replace("```", "")
+            # sql_query = sql_query.replace("<think>", "").replace("</think>", "")
+            # if "\n" in sql_query:
+            #     sql_query = sql_query.split("\n")[0]  # 只取第一行
+            content = response.content
+            # 移除所有標記和思考過程
+            content = content.replace("<think>", "").replace("</think>", "")
+            # 提取 SQL 代碼塊
+            sql_blocks = re.findall(r'```sql(.*?)```', content, re.DOTALL)
             
-            # 确保返回的是有效的 SQL 查询
+            if sql_blocks:
+                sql_query = sql_blocks[-1].strip()  # 使用最後一個 SQL 代碼塊
+            else:
+                # 如果沒有找到代碼塊，嘗試直接使用內容
+                sql_query = content.strip()
+            
+            # 確保是有效的 SQL 查詢
             if not sql_query or not sql_query.lower().startswith("select"):
                 print("Warning: Generated response is not a valid SQL query")
                 print(f"Raw response: {response}")
+                return None
             
-            print(f"Generated SQL: {sql_query}")  # 调试输出
+            print(f"Generated SQL: {sql_query}")
             return sql_query
         except Exception as e:
             print(f"生成SQL查询时出错: {str(e)}")

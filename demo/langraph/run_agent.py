@@ -1,12 +1,13 @@
 import time
 from data_mapping_agent import DataMappingAgent
-from data_sql import DataSQL
+from data_mapping import DataMapping
+from data_sql_RunnableWithMessageHistory import DataSQL
 
 def main():
     # 使用示例
     
     # 测试数据库
-    data_sql = DataSQL("deepseek-r1:14b", r'data\employee_data.parquet', "http://localhost:11434")
+    data_sql = DataSQL("deepseek-r1:14b", r'D:\zWork\dream2rich\ollama_agent\EDI-datamapping-and-processing\data\employee_data.parquet', "http://localhost:11434")
     res = data_sql.chat("查询所有数据")
     print("res: ", res)
     res = data_sql.chat("把刚才的数据通过年龄分成两组，一组是20岁以下的，一组是20岁以上的", res)

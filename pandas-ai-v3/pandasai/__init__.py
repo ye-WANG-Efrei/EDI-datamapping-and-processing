@@ -320,7 +320,7 @@ def read_parquet(filepath: str) -> DataFrame:
 def read_excel(filepath: str) -> Union[DataFrame, List[DataFrame]]:
     # Read all sheets into a dictionary {original_sheet_name: pandas_dataframe}
     data_dic = pd.read_excel(filepath, sheet_name=None)
-
+    result_list: List[DataFrame] = []
     if not data_dic: # No sheets found
         return [] # Return empty list
     elif len(data_dic) == 1:
@@ -328,10 +328,11 @@ def read_excel(filepath: str) -> Union[DataFrame, List[DataFrame]]:
         original_sheet_name = list(data_dic.keys())[0]
         pandas_df = list(data_dic.values())[0]
         table_name = sanitize_sql_table_name(str(original_sheet_name))
-        return DataFrame(pandas_df, _table_name=table_name)
+        result_list.append(DataFrame(pandas_df, _table_name=table_name))
+        return result_list
     else:
         # Multiple sheets, return a list of DataFrames with combined names
-        result_list: List[DataFrame] = []
+        
         sanitized_base_filename = sanitize_file_name(filepath) # Get sanitized filename once
         for original_sheet_name, pandas_df in data_dic.items():
             # Sanitize the sheet name

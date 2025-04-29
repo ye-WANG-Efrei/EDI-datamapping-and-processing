@@ -58,7 +58,7 @@ data_file_path_tbc = os.path.join(script_dir.parent.parent, "data", "TBC Lille.x
 pai.api_key.set("PAI-a4927d55-bcb4-4e97-8cef-4250564d1f69")
 
 # 读取数据
-df_genateq = pai.read_excel(data_file_path_genateq)
+df_genateq = pai.read_excel(data_file_path_tbc)
 df_tbc = pai.read_excel(data_file_path_tbc)
 
 df_genateq_list = []
@@ -66,7 +66,7 @@ df_genateq_list = []
 for df in df_genateq:
     # 规范化列名
     df.columns = [sanitize_column_name(col) for col in df.columns]
-    
+    print("df._table_name: ", df._table_name)
     df_name = df._table_name.replace(" ", "_")
     # Replace underscores with hyphens for the dataset name
     dataset_name = df_name.replace("_", "-")
@@ -91,29 +91,10 @@ for df in df_genateq:
         df_loaded.columns = [sanitize_column_name(col) for col in df_loaded.columns]
         df_genateq_list.append(df_loaded)
 
-# 规范化 TBC 数据集的列名
-df_tbc.columns = [sanitize_column_name(col) for col in df_tbc.columns]
 
-#load the tbc dataset
-tbc_dataset_name = "tbc"  # Already in correct format
-try:
-    # 创建 PandasAI DataFrame
-    df_tbc_copy = PaiDataFrame(df_tbc)
-    df_tbc_copy.columns = [sanitize_column_name(col) for col in df_tbc_copy.columns]
-    
-    tbc = pai.create(
-        path="myorg/{}".format(tbc_dataset_name),
-        df=df_tbc_copy,
-        description="tbc dataset, there is only 1 sheet in the excel file"
-    )
-except Exception as e:
-    print("error: ", e)
-    # 加载数据集时也确保列名被正确应用
-    tbc = pai.load("myorg/{}".format(tbc_dataset_name))
-    tbc.columns = [sanitize_column_name(col) for col in tbc.columns]
 
 print(df_genateq_list[0])
-request = '''Given datasets, filter both the location to be Lille. in the genateq dataset, column name is 'ville'. in the tbc dataset, column name is the column named 'Warehouse Name'and contains 'Lille'. if the item is in the tbc dataset, it should be in the genateq dataset. then, count how many item are matached, how many you cant match between the two datasets. if you cant match 'Warehouse Name' with 'Lille', you could find 'Warehouse_Name' or something similar.'''
-res = pai.chat(request, *df_genateq_list, tbc)
+request = '''show me all the columns in the dataset'''
+res = pai.chat(request, *df_genateq_list)
 # res= pai.chat("what is the average salary of the employees?",companies)
 print(res)
